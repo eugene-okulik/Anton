@@ -14,10 +14,8 @@ my_dict = {
 print(my_dict['tuple'][-1])
 my_dict['list'].append('list6')
 my_dict['list'].pop(1)
-my_dict['dict']['i am a tuple'] = 'test'
+my_dict['dict'][('i am a tuple',)] = 'test'
 del my_dict['dict']['dict1']
 my_dict['set'].add('python')
-my_dict['set'] = list(my_dict['set'])
-my_dict['set'].pop(False)
-my_dict['set'] = set(my_dict['set'])
+my_dict['set'].pop()
 print(my_dict)
