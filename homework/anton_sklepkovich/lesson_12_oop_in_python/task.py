@@ -83,32 +83,14 @@ class Bouquet:
         return f'Avg expire bouquet: {int(sum(life_time_list) / len(self.flowers_list))}'
 
     def sort_flowers(self, arg):
-        if arg == 'freshness':
-            sort_info = sorted(self.flowers_list, key=lambda flower: flower.freshness)
-        elif arg == 'color':
-            sort_info = sorted(self.flowers_list, key=lambda flower: flower.color)
-        elif arg == 'stem length':
-            sort_info = sorted(self.flowers_list, key=lambda flower: int(flower.stem_length))
-        elif arg == 'price':
-            sort_info = sorted(self.flowers_list, key=lambda flower: int(flower.price))
-        elif arg == 'life_time':
-            sort_info = sorted(self.flowers_list, key=lambda flower: int(flower.life_time))
+        sort_info = sorted(self.flowers_list, key=lambda flower: getattr(flower, arg))
         return (
             f'Sorted list of flowers in a bouquet in ascending order of {arg}:\n'
             f'{sort_info}'
         )
 
     def search_flower(self, arg, value):
-        if arg == 'freshness':
-            find = list(filter(lambda flower: value == flower.freshness, self.flowers_list))
-        elif arg == 'color':
-            find = list(filter(lambda flower: value == flower.color, self.flowers_list))
-        elif arg == 'stem length':
-            find = list(filter(lambda flower: value == flower.stem_length, self.flowers_list))
-        elif arg == 'price':
-            find = list(filter(lambda flower: int(value) == int(flower.price), self.flowers_list))
-        elif arg == 'life_time':
-            find = list(filter(lambda flower: int(value) == int(flower.life_time), self.flowers_list))
+        find = list(filter(lambda flower: value == getattr(flower, arg), self.flowers_list))
         return (
             f'The following flowers were found by value {arg}\n'
             f'{find}'
@@ -130,7 +112,7 @@ bouquet = Bouquet(piony, rose, rose_yellow)
 print(bouquet.expire_bouquet())
 print(bouquet.sort_flowers('freshness'))
 print(bouquet.sort_flowers('color'))
-print(bouquet.sort_flowers('stem length'))
+print(bouquet.sort_flowers('stem_length'))
 print(bouquet.sort_flowers('price'))
 print(bouquet.search_flower('freshness', 'Свежий'))
 print(bouquet.search_flower('price', '100'))
