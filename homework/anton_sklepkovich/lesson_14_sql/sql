@@ -1,0 +1,63 @@
+Создайте студента (student)
+INSERT INTO students (name, second_name, group_id) VALUES ('Matt', 'Damon', 1)
+
+Создайте несколько книг (books) и укажите, что ваш созданный студент взял их
+INSERT INTO books (title, taken_by_student_id)
+VALUES ('Acting', (SELECT id FROM students WHERE name = 'Matt' and second_name = 'Damon')),
+('Charisma', (SELECT id FROM students WHERE name = 'Matt' and second_name = 'Damon'))
+
+Создайте группу (group) и определите своего студента туда
+INSERT INTO `groups` (title, start_date, end_date)
+VALUES ('Hollywood', 'jan 2023', 'jan 2024')
+
+UPDATE students
+SET group_id = (SELECT id FROM `groups` WHERE title = 'Hollywood' ORDER BY id DESC LIMIT 1)
+WHERE id = 128
+
+Создайте несколько учебных предметов (subjects)
+INSERT INTO subjets (title)
+VALUES ('martial arts'),
+('vokals')
+
+Создайте по два занятия для каждого предмета (lessons)
+INSERT INTO lessons (title, subject_id)
+VALUES ('lesson_1 martial arts', (SELECT id FROM subjets WHERE title = 'martial arts')),
+	('lesson_2 martial arts', (SELECT id FROM subjets WHERE title = 'martial arts')),
+	('lesson_1 vokals', (SELECT id FROM subjets WHERE title = 'vokals')),
+	('lesson_2 vokals', (SELECT id FROM subjets WHERE title = 'vokals'))
+
+Поставьте своему студенту оценки (marks) для всех созданных вами занятий
+SELECT * FROM marks WHERE student_id = 128
+
+SELECT id
+FROM lessons
+WHERE title
+IN ('lesson_2 martial arts', 'lesson_1 martial arts', 'lesson_1 vokals', 'lesson_2 vokals')
+
+INSERT INTO marks (value, lesson_id, student_id)
+VALUES ('5', 163, 128),
+('5', 164, 128),
+('4', 165, 128),
+('4', 166, 128)
+
+Все оценки студента
+SELECT value AS matts_grade FROM marks WHERE student_id = 128
+
+Все книги, которые находятся у студента
+SELECT title AS name_book FROM books WHERE taken_by_student_id = 128
+
+Для вашего студента выведите всё, что о нем есть в базе: группа, книги, оценки с названиями занятий и предметов (всё одним запросом с использованием Join)
+SELECT s.name,
+s.second_name,
+g.title AS name_group,
+b.title AS name_book,
+m.value AS  grade,
+l.title AS name_lesson,
+s2.title AS name_subjects
+FROM students s
+JOIN `groups` g ON s.group_id = g.id
+JOIN books b ON s.id = b.taken_by_student_id
+JOIN marks m ON s.id = m.student_id
+JOIN lessons l ON m.lesson_id = l.id
+JOIN subjets s2 ON l.subject_id = s2.id
+WHERE s.id = 128
