@@ -14,12 +14,12 @@ INSERT_QWERY_MARK = "INSERT INTO marks (value, lesson_id, student_id) VALUES (%s
 
 dotenv.load_dotenv()
 db = mysql.connect(
-        user=os.getenv('DB_USER'),
-        passwd=os.getenv('DB_PASSW'),
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
-        database=os.getenv('DB_NAME')
-    )
+    user=os.getenv('DB_USER'),
+    passwd=os.getenv('DB_PASSW'),
+    host=os.getenv('DB_HOST'),
+    port=os.getenv('DB_PORT'),
+    database=os.getenv('DB_NAME')
+)
 cursor = db.cursor(dictionary=True)
 
 
