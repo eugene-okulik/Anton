@@ -1,10 +1,11 @@
+import pytest
 import requests
 import jsonschema
-from homework.anton_sklepkovich.exp_result import json_schema
 import copy
 import deepmerge
+import random
+from homework.anton_sklepkovich.exp_result import json_schema
 from homework.anton_sklepkovich.exp_result.name_error import status_is_not_200, status_is_not_404
-
 
 BASE_URL = 'https://api.restful-api.dev/objects'
 BASE_HEADERS = {"content-type": "application/json"}
@@ -19,15 +20,6 @@ BASE_BODY = {
 }
 
 
-def post_create_one(url=BASE_URL, body=BASE_BODY, headers=BASE_HEADERS):
-    response = requests.post(
-        url,
-        json=body,
-        headers=headers
-    )
-    return response
-
-
 def delete_one(id_delete):
     response = requests.delete(
         BASE_URL + '/' + id_delete
@@ -35,15 +27,17 @@ def delete_one(id_delete):
     return response
 
 
-def post_create():
-    response = post_create_one()
-    print(f'Status code response = {response.status_code}')
-    assert response.status_code == 200, status_is_not_200
-    print(f'Response body = {response.json()}')
-    jsonschema.validate(response.json(), json_schema.json_schema_create)
-    assert BASE_BODY['name'] == response.json()['name'], (f"The Name doesn't mismatch\n"
-                                                          f'act name = {response.json()["name"]}\n'
-                                                          f'exp name = {BASE_BODY["name"]}\n')
+def generate_body():
+    body = {
+        "name": f"Apple MacBook Pro {random.randint(1, 20)}",
+        "data": {
+            "year": random.randint(2000, 2023),
+            "price": 1849.99,
+            "CPU model": "Intel Core i9",
+            "Hard disk size": "1 TB"
+        }
+    }
+    return body
 
 
 def get_obj(id_obj):
@@ -51,18 +45,57 @@ def get_obj(id_obj):
     return requests.get(url)
 
 
-def update_obj():
-    body = {
-        "name": "Apple MacBook Pro 16",
-        "data": {
-            "year": 2020,
-            "price": 2049.99,
-            "CPU model": "Intel Core i10",
-            "Hard disk size": "2 TB",
-            "color": "silver"
-        }
-    }
-    id_resp = post_create_one().json()['id']
+@pytest.fixture(scope='session')
+def start_end():
+    print('\nStart testing')
+    yield
+    print('\nTesting completed')
+
+
+@pytest.fixture()
+def before_after():
+    print('\nbefore test')
+    yield
+    print('\nafter test')
+
+
+@pytest.fixture()
+def post_create_one(url=BASE_URL, body=BASE_BODY, headers=BASE_HEADERS):
+    response = requests.post(
+        url,
+        json=body,
+        headers=headers
+    )
+    yield response
+    resp = requests.delete(
+        BASE_URL + '/' + response.json()['id']
+    )
+    print(f'\nId has been deleted {resp.json()}')
+
+
+@pytest.mark.critical
+@pytest.mark.parametrize('request_body', [generate_body() for _ in range(3)])
+def test_post_create(request_body, start_end, before_after):
+    response = requests.post(
+        BASE_URL,
+        json=request_body,
+        headers=BASE_HEADERS
+    )
+    print(f'\nStatus code response = {response.status_code}')
+    assert response.status_code == 200, status_is_not_200
+    print(f'\nResponse body = {response.json()}')
+    jsonschema.validate(response.json(), json_schema.json_schema_create)
+    assert BASE_BODY['name'] == response.json()['name'], (f"The Name doesn't mismatch\n"
+                                                          f'act name = {response.json()["name"]}\n'
+                                                          f'exp name = {BASE_BODY["name"]}\n')
+    delete_one(response.json()['id'])
+
+
+@pytest.mark.medium
+def test_update_obj(post_create_one, before_after):
+    body = generate_body()
+    body['data']['color'] = 'silver'
+    id_resp = post_create_one.json()['id']
     response = requests.put(
         BASE_URL + '/' + id_resp,
         json=body,
@@ -79,19 +112,13 @@ def update_obj():
                                               f"act data = {response['data']}\n "
                                               f"exp data = {body['data']}\n")
     jsonschema.validate(response, json_schema.json_schema_update)
-    delete_one(id_resp)
 
 
-def update_patch():
-    body = {
-        "name": "Apple MacBook Pro 163",
-        "data": {
-            "CPU model": "Intel Core i00"
-        }
-    }
+def test_update_patch(post_create_one, before_after):
+    body = generate_body()
     body_for_merge = copy.deepcopy(BASE_BODY)
     new_body = deepmerge.always_merger.merge(body_for_merge, body)
-    id_resp = post_create_one().json()['id']
+    id_resp = post_create_one.json()['id']
     response = requests.patch(
         BASE_URL + '/' + id_resp,
         json=new_body,
@@ -108,18 +135,15 @@ def update_patch():
     assert response['name'] == new_body['name'], (f"The Name doesn't mismatch\n "
                                                   f"act name = {response['name']}\n "
                                                   f"exp name = {new_body['name']}\n")
+
+
+def test_delete_obj(before_after):
+    response = requests.post(
+        BASE_URL,
+        json=BASE_BODY,
+        headers=BASE_HEADERS
+    )
+    id_resp = response.json()['id']
     delete_one(id_resp)
-
-
-def delete_obj():
-    id_resp = post_create_one().json()['id']
-    response = delete_one(id_resp)
     get_obj_response = get_obj(id_resp)
-    print(response.status_code)
     assert get_obj_response.status_code == 404, status_is_not_404
-
-
-post_create()
-update_obj()
-update_patch()
-delete_obj()
