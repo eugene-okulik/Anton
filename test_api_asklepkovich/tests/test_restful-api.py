@@ -43,12 +43,11 @@ TEST_DATA_UPDATE = [
 @allure.title('Test post object')
 @allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.parametrize('data', TEST_DATA)
-def test_post_create(create_post_endpoint, data, delete_post):
-    response_id = create_post_endpoint.new_post(payload=data).json()['id']
-    create_post_endpoint.check_status_is_200()
-    create_post_endpoint.check_response_name_is_correct(data['name'])
-    create_post_endpoint.check_jsonschema()
-    delete_post.delete_post(response_id)
+def test_post_create(create_post_endpoint_with_tear_down, data):
+    create_post_endpoint_with_tear_down.new_post(payload=data)
+    create_post_endpoint_with_tear_down.check_status_is_200()
+    create_post_endpoint_with_tear_down.check_response_name_is_correct(data['name'])
+    create_post_endpoint_with_tear_down.check_jsonschema()
 
 
 @allure.feature('Test api')

@@ -61,3 +61,10 @@ def post_create_and_delete(create_post_endpoint, delete_post, generate_body):
 def only_post_create(create_post_endpoint, generate_body):
     response = create_post_endpoint.new_post(generate_body)
     return response.json()['id']
+
+
+@pytest.fixture()
+def create_post_endpoint_with_tear_down(create_post_endpoint, delete_post):
+    yield create_post_endpoint
+    delete_post.delete_post(post_id=create_post_endpoint.post_id)
+    print(f'\nId has been deleted {create_post_endpoint.post_id}')
