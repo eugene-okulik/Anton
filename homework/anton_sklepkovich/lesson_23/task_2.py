@@ -3,9 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 import platform
 
 
@@ -40,16 +40,19 @@ def test_fill_form(driver):
     input_subject.click()
     input_subject = driver.find_element(By.CSS_SELECTOR, '#subjectsInput')
     input_subject.send_keys('English')
-    input_subject.send_keys(Keys.ENTER)
+    # input_subject.send_keys(Keys.ENTER)
+    find_english = driver.find_element(By.CLASS_NAME, 'subjects-auto-complete__menu')
+    actions = ActionChains(driver)
+    actions.move_to_element(find_english)
+    actions.click()
+    actions.perform()
     input_text_birth = driver.find_element(By.CSS_SELECTOR, '#dateOfBirthInput')
     input_text_birth.click()
     match os_type:
-        case 'Windows':
-            action = ActionChains(driver)
-            action.key_down(Keys.CONTROL).send_keys('a').key_up(Keys.CONTROL).perform()
+        case 'Darwin':
+            input_text_birth.send_keys(Keys.COMMAND + 'a')
         case _:
-            action = ActionChains(driver)
-            action.key_down(Keys.COMMAND).send_keys('a').key_up(Keys.COMMAND).perform()
+            input_text_birth.send_keys(Keys.CONTROL + 'a')
     input_text_birth.send_keys('01 Feb 2000')
     input_text_birth.send_keys(Keys.ENTER)
     hobby = driver.find_elements(By.CSS_SELECTOR, '.custom-checkbox')

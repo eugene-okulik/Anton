@@ -10,8 +10,7 @@ from selenium.webdriver.support.select import Select
 @pytest.fixture()
 def driver():
     chrome_driver = webdriver.Chrome()
-    yield chrome_driver
-    time.sleep(5)
+    return chrome_driver
 
 
 def test_select_python(driver):
