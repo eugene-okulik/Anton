@@ -1,0 +1,6 @@
+shop_women_deals = '.more.button'
+men_bargains = '.block-promo.sale-mens'
+luma_gear_steals = '.block-promo.sale-women'
+title = '.title'
+info = '.info'
+more_icon = '.more.icon'
