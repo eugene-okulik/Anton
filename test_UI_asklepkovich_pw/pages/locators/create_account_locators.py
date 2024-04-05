@@ -1,0 +1,13 @@
+
+first_name = '#firstname'
+last_name = '#lastname'
+email = '#email_address'
+password = '#password'
+confirm_password = '#password-confirmation'
+btn_create_account = '.submit'
+alert = '[data-bind="html: $parent.prepareMessageForHtml(message.text)"]'
+first_name_error = '#firstname-error'
+last_name_error = '#lastname-error'
+email_error = '#email_address-error'
+password_error = '#password-error'
+confirm_password_error = '#password-confirmation-error'
