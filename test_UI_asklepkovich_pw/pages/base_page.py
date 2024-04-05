@@ -1,6 +1,6 @@
 import allure
 import inspect
-from playwright.sync_api import Page, expect, Dialog, Locator
+from playwright.sync_api import Page, expect, Locator
 from test_UI_asklepkovich_pw.pages.locators import create_account_locators as loc
 from test_UI_asklepkovich_pw.pages.locators import eco_friendly_locators as loc_eco
 from allure_commons.types import AttachmentType
@@ -16,7 +16,6 @@ class BasePage:
     def __init__(self, page: Page):
         self.page = page
 
-
     @staticmethod
     def assert_check(act_result, exp_result, message):
         stack = inspect.stack()
@@ -30,11 +29,9 @@ class BasePage:
                                          f'Done checking: {name_function}\n'
         print(f'Done checking: {name_function}\n')
 
-
     def wait_full_to_load(self):
         welcome = self.find(loc_eco.welcome).first
         return expect(welcome).not_to_be_empty()
-
 
     @allure.step('Open page for test ')
     def open_page(self, delete_cookies=None):
@@ -47,16 +44,13 @@ class BasePage:
         else:
             raise NotImplementedError('Page can not be opened for this page class')
 
-
     def find(self, locator: str) -> Locator:
         return self.page.locator(locator)
-
 
     @allure.step('Checking message in alert')
     def check_alert_text(self, text):
         self.wait_full_to_load()
         expect(self.find(loc.alert)).to_have_text(text)
-
 
     @allure.step('Checking error message for field')
     def check_error_message(self, field, exp_error):
@@ -92,18 +86,14 @@ class BasePage:
                     confirm_password_field.text_content(), exp_error, f'Error check {field}'
                 )
 
-
     def check_title(self, exp_title):
         self.assert_check(self.title, exp_title, 'Error check title\n')
-
 
     def check_info(self, exp_info):
         self.assert_check(self.info, exp_info, 'Error check info\n')
 
-
     def check_more_icon(self, exp_more_icon):
         self.assert_check(self.more_icon, exp_more_icon, 'Error check more icon\n')
-
 
     @allure.step('Screenshot')
     def screenshot(self, file_name='screenshot.png'):
