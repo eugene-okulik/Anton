@@ -1,0 +1,12 @@
+/dev/null: character special file
+/dev/zero: character special file
+/dev/sda: такого файла не нашел (
+но в интернетах пишут что это специальный файл устройства, используемый ядром Linux для доступа к первому разделу,
+размещенному на устройстве /dev/sda
+)
+/dev/tty: character special file
+/root: directory
+/etc/passwd: regular file
+/proc/mounts: symbolic link
+/bin/ls: regular file
+/bin/zcat: regular file
